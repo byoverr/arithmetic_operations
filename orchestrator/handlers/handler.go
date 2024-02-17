@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"arithmetic_operations/agent"
 	"arithmetic_operations/check_expression"
 	"arithmetic_operations/orchestrator/models"
 	"database/sql"
@@ -12,7 +13,7 @@ import (
 	"strconv"
 )
 
-func HandlerCreateExpression(log *slog.Logger, expressionSaver func(expression *models.Expression) error) http.HandlerFunc {
+func HandlerCreateExpression(log *slog.Logger, expressionSaver func(expression *models.Expression) error, operationreader func() ([]*models.Operation, error), undoneExpressionsReader func() ([]*models.Expression, error), expressionUpdater func(expression *models.Expression) error, agents *agent.Calculator) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var inputExpression models.InputExpression
 		var expression *models.Expression
@@ -61,8 +62,30 @@ func HandlerCreateExpression(log *slog.Logger, expressionSaver func(expression *
 			log.Info("added expression to db", expression)
 		}
 
-		//TODO: add parser and start to solve
+		operations, errDb := operationreader()
+		if errDb != nil {
+			log.Error("problem with database", slog.String("error", errDb.Error()))
 
+			jsonError := models.NewError("problem with database")
+
+			render.Status(r, http.StatusInternalServerError)
+			render.JSON(w, r, jsonError)
+
+			return
+		}
+		_, errDb = undoneExpressionsReader()
+		if errDb != nil {
+			log.Error("problem with database", slog.String("error", errDb.Error()))
+
+			jsonError := models.NewError("problem with database")
+
+			render.Status(r, http.StatusInternalServerError)
+			render.JSON(w, r, jsonError)
+
+			return
+		}
+
+		agent.CreateTask(agents, expression, operations, expressionUpdater)
 		render.Status(r, http.StatusOK)
 		render.JSON(w, r, expression)
 
@@ -166,7 +189,7 @@ func HandlerPutOperations(log *slog.Logger, operationUpdate func(operation *mode
 		errDb := operationUpdate(&operation)
 
 		if errDb != nil {
-			log.Error("could not update operation: %+v", operation)
+			log.Error("could not update operation: ", operation)
 			render.Status(r, http.StatusInternalServerError)
 			render.JSON(w, r, models.NewError("could not update operation"))
 		}

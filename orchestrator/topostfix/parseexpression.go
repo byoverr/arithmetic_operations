@@ -2,12 +2,13 @@ package topostfix
 
 import (
 	"arithmetic_operations/orchestrator/models"
-	"bufio"
 	"crypto/rand"
 	"encoding/hex"
-	"os"
+	"errors"
+	"fmt"
 	"strconv"
 	"strings"
+	"time"
 )
 
 func makeID() string {
@@ -116,32 +117,42 @@ func InsertSubExpressions(expr []models.SubExpression, sl []string) string {
 	}
 	return strings.Join(sl, " ")
 }
-func CountSubExpressions(expr []models.SubExpression) []models.SubExpression {
-	for i := range expr {
-		if expr[i].Operator == "+" {
-			//TODO: time.sleep(duration)
-			expr[i].Value = expr[i].Leftnum + expr[i].Rightnum
-			expr[i].IsDone = true
-		} else if expr[i].Operator == "-" {
-			expr[i].Value = expr[i].Leftnum - expr[i].Rightnum
-			expr[i].IsDone = true
-		} else if expr[i].Operator == "*" {
-			expr[i].Value = expr[i].Leftnum * expr[i].Rightnum
-			expr[i].IsDone = true
-		} else if expr[i].Operator == "/" {
-			expr[i].Value = expr[i].Leftnum / expr[i].Rightnum
-			expr[i].IsDone = true
+func CountSubExpressions(expr models.SubExpression, operations []*models.Operation) (models.SubExpression, error) {
+	var timeForAddition, timeForSubtraction, timeForMultiplication, timeForDivision int
+	fmt.Println(operations[0], operations[1], operations[2], operations[3])
+	for _, i := range operations {
+		if i.OperationKind == models.Addition {
+			timeForAddition = i.DurationInMilliSecond
+		} else if i.OperationKind == models.Subtraction {
+			timeForSubtraction = i.DurationInMilliSecond
+		} else if i.OperationKind == models.Multiplication {
+			timeForMultiplication = i.DurationInMilliSecond
 		} else {
-			continue
+			timeForDivision = i.DurationInMilliSecond
 		}
 	}
-	return expr
-}
-
-func ReadFromInput() (string, error) {
-
-	reader := bufio.NewReader(os.Stdin)
-	s, err := reader.ReadString('\n')
-
-	return strings.TrimSpace(s), err
+	fmt.Println(timeForAddition, timeForSubtraction, timeForMultiplication, timeForDivision)
+	if expr.Operator == "+" {
+		time.Sleep(time.Duration(timeForAddition) * time.Millisecond)
+		expr.Value = expr.Leftnum + expr.Rightnum
+		expr.IsDone = true
+	} else if expr.Operator == "-" {
+		time.Sleep(time.Duration(timeForSubtraction) * time.Millisecond)
+		expr.Value = expr.Leftnum - expr.Rightnum
+		expr.IsDone = true
+	} else if expr.Operator == "*" {
+		time.Sleep(time.Duration(timeForMultiplication) * time.Millisecond)
+		expr.Value = expr.Leftnum * expr.Rightnum
+		expr.IsDone = true
+	} else if expr.Operator == "/" {
+		time.Sleep(time.Duration(timeForDivision) * time.Millisecond)
+		if expr.Rightnum == 0 {
+			expr.Value = 0
+			expr.IsDone = true
+			return models.SubExpression{}, errors.New("division by zero in subexpression")
+		}
+		expr.Value = expr.Leftnum / expr.Rightnum
+		expr.IsDone = true
+	}
+	return expr, nil
 }

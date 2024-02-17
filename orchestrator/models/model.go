@@ -55,7 +55,7 @@ func NewExpression(expression string) *Expression {
 
 type Operation struct {
 	OperationKind         OperationType `json:"operationKind" validate:"required"`
-	DurationInMilliSecond int           `json:"durationInMilliSecond" validate:"duration_in_sec,required"`
+	DurationInMilliSecond int           `json:"durationInMilliSecond" validate:"duration_in_millisec,required"`
 }
 
 type OperationType string

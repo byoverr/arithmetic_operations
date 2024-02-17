@@ -5,9 +5,9 @@
     "idle_timeout": "60s"
   },
   "storage": {
-    "user": "postgres",
     "dbname": "arithmetic_operations",
-    "password": "password",
+    "user": "postgres",
+    "password": "admin",
     "host": "localhost",
     "port": "5432",
     "sslmode": "disable",
@@ -15,15 +15,12 @@
   },
   "operation": {
     "count_operation": 4,
-    "addition": 0,
-    "subtraction": 0,
-    "multiplication": 0,
-    "division": 0
+    "addition": 2000,
+    "subtraction": 2000,
+    "multiplication": 200,
+    "division": 200
   },
-  "quick_access_storage": {
-    "addr": "redis:6379",
-    "ttl": "60s",
-    "password": "",
-    "db": 0
+  "agents": {
+    "count_of_agents": 1
   }
 }

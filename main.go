@@ -1,6 +1,7 @@
 package main
 
 import (
+	"arithmetic_operations/agent"
 	"arithmetic_operations/orchestrator/config"
 	"arithmetic_operations/orchestrator/handlers"
 	"arithmetic_operations/orchestrator/prettylogger"
@@ -24,6 +25,10 @@ func main() {
 	//logger := slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelDebug}))
 	logger := slog.New(handler)
 
+	agents, err := agent.InitializeAgents(cfg.Agent.CountOfAgents)
+	if err != nil {
+		log.Fatal(err)
+	}
 	repo, err := storage.PostgresqlOpen(cfg)
 	if err != nil {
 		log.Fatal(err)
@@ -33,7 +38,7 @@ func main() {
 	router.Use(middleware.Logger)
 	router.Use(middleware.Recoverer)
 	router.Use(middleware.URLFormat)
-	setURLPatterns(router, logger, repo)
+	setURLPatterns(router, logger, repo, agents)
 
 	logger.Info("start server", slog.String("address", cfg.HTTPServer.Address))
 
@@ -50,30 +55,11 @@ func main() {
 	}
 }
 
-func setURLPatterns(router *chi.Mux, logger *slog.Logger, repo *storage.PostgresqlDB) {
-	router.Post("/expression", handlers.HandlerCreateExpression(logger, repo.CreateExpression))
+func setURLPatterns(router *chi.Mux, logger *slog.Logger, repo *storage.PostgresqlDB, agents *agent.Calculator) {
+	router.Post("/expression", handlers.HandlerCreateExpression(logger, repo.CreateExpression,
+		repo.ReadAllOperations, repo.ReadAllExpressionsUndone, repo.UpdateExpression, agents))
 	router.Get("/expression", handlers.HandlerGetAllExpression(logger, repo.ReadAllExpressions))
 	router.Get("/expression/{id}", handlers.HandlerGetExpression(logger, repo.ReadExpression))
 	router.Get("/operation", handlers.HandlerGetAllOperations(logger, repo.ReadAllOperations))
 	router.Put("/operation", handlers.HandlerPutOperations(logger, repo.UpdateOperation))
 }
-
-//fmt.Print("Enter infix expression: ")
-//infixString, err := topostfix.ReadFromInput()
-//
-//if err != nil {
-//	fmt.Println("Error when scanning input:", err.Error())
-//	return
-//}
-//
-//lol := topostfix.ToPostfix(infixString)
-//fmt.Println(lol)
-//for {
-//	k, q := topostfix.GetSubExpressions(lol)
-//	t := topostfix.CountSubExpressions(k)
-//	lol = topostfix.InsertSubExpressions(t, q)
-//	fmt.Println(lol, q)
-//	if len(q) == 1 {
-//		break
-//	}
-//}

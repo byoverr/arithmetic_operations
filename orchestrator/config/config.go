@@ -10,6 +10,7 @@ type Config struct {
 	HTTPServer HTTPServer `mapstructure:"http_server"`
 	Storage    Storage    `mapstructure:"storage"`
 	Operation  Operation  `mapstructure:"operation"`
+	Agent      Agent      `mapstructure:"agents"`
 }
 
 type HTTPServer struct {
@@ -34,6 +35,10 @@ type Operation struct {
 	DurationInMilliSecondMultiplication int `mapstructure:"multiplication"`
 	DurationInMilliSecondDivision       int `mapstructure:"division"`
 	CountOperation                      int `mapstructure:"count_operation"`
+}
+
+type Agent struct {
+	CountOfAgents int `mapstructure:"count_of_agents"`
 }
 
 func Load() *Config {
