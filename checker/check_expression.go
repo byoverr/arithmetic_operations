@@ -21,37 +21,6 @@ func RemoveAllSpaces(a string) string {
 }
 
 // CheckExpression проверяет на все возможные ошибки
-//func CheckExpression(log *slog.Logger, expression string) error {
-//	var wg sync.WaitGroup
-//	log.Info("start check expression", slog.String("expr", expression))
-//	if len(expression) == 0 {
-//		log.Error("length of expression is 0", slog.String("expr", expression))
-//		return errors.New("length of expression is 0")
-//	}
-//	RemoveAllSpaces(expression)
-//	err := make(chan error)
-//	ctx := context.Background()
-//	wg.Add(7)
-//	Checker(&ctx, HasDoubleSymbol, expression, &wg, err)
-//	Checker(&ctx, ExpressionStartsWithNumber, expression, &wg, err)
-//	Checker(&ctx, IsValidParentheses, expression, &wg, err)
-//	Checker(&ctx, HasDivizionByZero, expression, &wg, err)
-//	Checker(&ctx, HasValidCharacters, expression, &wg, err)
-//	Checker(&ctx, HasAtLeastOneExpression, expression, &wg, err)
-//	Checker(&ctx, ContainsCorrectFloatPoint, expression, &wg, err)
-//	wg.Wait()
-//	if len(err) == 0 {
-//		close(err)
-//		log.Info("successful check expression", slog.String("expr", expression))
-//		return nil
-//	} else {
-//		errChan := <-err
-//		close(err)
-//		log.Error("error with checking", slog.String("error", errChan.Error()))
-//		return errChan
-//	}
-//}
-
 func CheckExpression(log *slog.Logger, expression string) error {
 	var wg sync.WaitGroup
 	log.Info("start check expression", slog.String("expr", expression))
