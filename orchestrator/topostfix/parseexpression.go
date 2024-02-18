@@ -5,7 +5,6 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 	"errors"
-	"fmt"
 	"strconv"
 	"strings"
 	"time"
@@ -119,7 +118,6 @@ func InsertSubExpressions(expr []models.SubExpression, sl []string) string {
 }
 func CountSubExpressions(expr models.SubExpression, operations []*models.Operation) (models.SubExpression, error) {
 	var timeForAddition, timeForSubtraction, timeForMultiplication, timeForDivision int
-	fmt.Println(operations[0], operations[1], operations[2], operations[3])
 	for _, i := range operations {
 		if i.OperationKind == models.Addition {
 			timeForAddition = i.DurationInMilliSecond
@@ -131,7 +129,6 @@ func CountSubExpressions(expr models.SubExpression, operations []*models.Operati
 			timeForDivision = i.DurationInMilliSecond
 		}
 	}
-	fmt.Println(timeForAddition, timeForSubtraction, timeForMultiplication, timeForDivision)
 	if expr.Operator == "+" {
 		time.Sleep(time.Duration(timeForAddition) * time.Millisecond)
 		expr.Value = expr.Leftnum + expr.Rightnum

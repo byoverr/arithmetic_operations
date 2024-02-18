@@ -2,7 +2,7 @@ package handlers
 
 import (
 	"arithmetic_operations/agent"
-	"arithmetic_operations/check_expression"
+	"arithmetic_operations/checker"
 	"arithmetic_operations/orchestrator/models"
 	"database/sql"
 	"errors"
@@ -13,7 +13,7 @@ import (
 	"strconv"
 )
 
-func HandlerCreateExpression(log *slog.Logger, expressionSaver func(expression *models.Expression) error, operationreader func() ([]*models.Operation, error), undoneExpressionsReader func() ([]*models.Expression, error), expressionUpdater func(expression *models.Expression) error, agents *agent.Calculator) http.HandlerFunc {
+func HandlerCreateExpression(log *slog.Logger, expressionSaver func(expression *models.Expression) error, operationreader func() ([]*models.Operation, error), undoneExpressionsReader func() ([]*models.Expression, error), agents *agent.Calculator) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var inputExpression models.InputExpression
 		var expression *models.Expression
@@ -31,20 +31,18 @@ func HandlerCreateExpression(log *slog.Logger, expressionSaver func(expression *
 
 		log.Info("request body decoded")
 
-		errValidating := check_expression.CheckExpression(log, inputExpression.Expression)
+		errValidating := checker.CheckExpression(log, inputExpression.Expression)
 
 		if errValidating != nil {
 			expression = models.NewExpressionInvalid(inputExpression.Expression)
 		} else {
 			expression = models.NewExpressionInProcess(inputExpression.Expression)
 		}
-
+		expression.Expression = checker.RemoveAllSpaces(expression.Expression)
 		if errValidating != nil {
 			jsonError := models.NewError(errValidating.Error())
-
 			render.Status(r, http.StatusBadRequest)
 			render.JSON(w, r, jsonError)
-
 			return
 		}
 		errDb := expressionSaver(expression)
@@ -73,23 +71,22 @@ func HandlerCreateExpression(log *slog.Logger, expressionSaver func(expression *
 
 			return
 		}
-		_, errDb = undoneExpressionsReader()
-		if errDb != nil {
-			log.Error("problem with database", slog.String("error", errDb.Error()))
-
-			jsonError := models.NewError("problem with database")
-
-			render.Status(r, http.StatusInternalServerError)
-			render.JSON(w, r, jsonError)
-
-			return
-		}
-
-		agent.CreateTask(agents, expression, operations, expressionUpdater)
+		//_, errDb = undoneExpressionsReader()
+		//if errDb != nil {
+		//	log.Error("problem with database", slog.String("error", errDb.Error()))
+		//
+		//	jsonError := models.NewError("problem with database")
+		//
+		//	render.Status(r, http.StatusInternalServerError)
+		//	render.JSON(w, r, jsonError)
+		//
+		//	return
+		//}
 		render.Status(r, http.StatusOK)
 		render.JSON(w, r, expression)
-
 		log.Info("expression added", slog.Int("id", expression.Id))
+		agent.CreateTask(agents, expression, operations)
+		log.Info("task created")
 	}
 }
 
@@ -178,23 +175,35 @@ func HandlerPutOperations(log *slog.Logger, operationUpdate func(operation *mode
 
 		log.Info("request body decoded")
 
-		//errValidating := validators.ValidateOperation(operation)
+		errValidating := checker.ValidateOperation(operation)
 
-		//if errValidating != nil {
-		//	render.Status(r, http.StatusInternalServerError)
-		//	render.JSON(w, r, models.NewError(errValidating.Error()))
-		//	return
-		//}
+		if errValidating != nil {
+			log.Error("error with validating operation", operation, slog.String("error", errValidating.Error()))
+			render.Status(r, http.StatusInternalServerError)
+			render.JSON(w, r, models.NewError(errValidating.Error()))
+			return
+		}
 
 		errDb := operationUpdate(&operation)
 
 		if errDb != nil {
-			log.Error("could not update operation: ", operation)
+			log.Error("could not update operation: ", operation, slog.String("errorDb", errDb.Error()))
 			render.Status(r, http.StatusInternalServerError)
 			render.JSON(w, r, models.NewError("could not update operation"))
 		}
 
 		log.Info("successful to update operation")
 		w.WriteHeader(http.StatusOK)
+	}
+}
+
+func HandlerGetAllAgents(log *slog.Logger, calc *agent.Calculator) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		log.Info("start get all agents")
+
+		agents := calc.Agents
+		log.Info("successful to get all agents")
+		render.Status(r, http.StatusOK)
+		render.JSON(w, r, agents)
 	}
 }

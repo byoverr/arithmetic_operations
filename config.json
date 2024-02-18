@@ -15,8 +15,8 @@
   },
   "operation": {
     "count_operation": 4,
-    "addition": 2000,
-    "subtraction": 2000,
+    "addition": 200,
+    "subtraction": 200,
     "multiplication": 200,
     "division": 200
   },

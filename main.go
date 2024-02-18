@@ -25,14 +25,15 @@ func main() {
 	//logger := slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelDebug}))
 	logger := slog.New(handler)
 
-	agents, err := agent.InitializeAgents(cfg.Agent.CountOfAgents)
-	if err != nil {
-		log.Fatal(err)
-	}
 	repo, err := storage.PostgresqlOpen(cfg)
 	if err != nil {
 		log.Fatal(err)
 	}
+	agents, err := agent.InitializeAgents(cfg.Agent.CountOfAgents)
+	if err != nil {
+		log.Fatal(err)
+	}
+	agents.CheckerForNewTasks(repo.UpdateExpression)
 
 	router := chi.NewRouter()
 	router.Use(middleware.Logger)
@@ -57,9 +58,10 @@ func main() {
 
 func setURLPatterns(router *chi.Mux, logger *slog.Logger, repo *storage.PostgresqlDB, agents *agent.Calculator) {
 	router.Post("/expression", handlers.HandlerCreateExpression(logger, repo.CreateExpression,
-		repo.ReadAllOperations, repo.ReadAllExpressionsUndone, repo.UpdateExpression, agents))
+		repo.ReadAllOperations, repo.ReadAllExpressionsUndone, agents))
 	router.Get("/expression", handlers.HandlerGetAllExpression(logger, repo.ReadAllExpressions))
 	router.Get("/expression/{id}", handlers.HandlerGetExpression(logger, repo.ReadExpression))
 	router.Get("/operation", handlers.HandlerGetAllOperations(logger, repo.ReadAllOperations))
 	router.Put("/operation", handlers.HandlerPutOperations(logger, repo.UpdateOperation))
+	router.Get("/agents", handlers.HandlerGetAllAgents(logger, agents))
 }

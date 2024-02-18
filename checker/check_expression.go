@@ -1,4 +1,4 @@
-package check_expression
+package checker
 
 import (
 	"arithmetic_operations/orchestrator/topostfix"
@@ -21,6 +21,37 @@ func RemoveAllSpaces(a string) string {
 }
 
 // CheckExpression проверяет на все возможные ошибки
+//func CheckExpression(log *slog.Logger, expression string) error {
+//	var wg sync.WaitGroup
+//	log.Info("start check expression", slog.String("expr", expression))
+//	if len(expression) == 0 {
+//		log.Error("length of expression is 0", slog.String("expr", expression))
+//		return errors.New("length of expression is 0")
+//	}
+//	RemoveAllSpaces(expression)
+//	err := make(chan error)
+//	ctx := context.Background()
+//	wg.Add(7)
+//	Checker(&ctx, HasDoubleSymbol, expression, &wg, err)
+//	Checker(&ctx, ExpressionStartsWithNumber, expression, &wg, err)
+//	Checker(&ctx, IsValidParentheses, expression, &wg, err)
+//	Checker(&ctx, HasDivizionByZero, expression, &wg, err)
+//	Checker(&ctx, HasValidCharacters, expression, &wg, err)
+//	Checker(&ctx, HasAtLeastOneExpression, expression, &wg, err)
+//	Checker(&ctx, ContainsCorrectFloatPoint, expression, &wg, err)
+//	wg.Wait()
+//	if len(err) == 0 {
+//		close(err)
+//		log.Info("successful check expression", slog.String("expr", expression))
+//		return nil
+//	} else {
+//		errChan := <-err
+//		close(err)
+//		log.Error("error with checking", slog.String("error", errChan.Error()))
+//		return errChan
+//	}
+//}
+
 func CheckExpression(log *slog.Logger, expression string) error {
 	var wg sync.WaitGroup
 	log.Info("start check expression", slog.String("expr", expression))
@@ -29,27 +60,28 @@ func CheckExpression(log *slog.Logger, expression string) error {
 		return errors.New("length of expression is 0")
 	}
 	RemoveAllSpaces(expression)
-	err := make(chan error)
+	errChan := make(chan error, 7)
 	ctx := context.Background()
-	defer close(err)
 	wg.Add(7)
-	Checker(&ctx, HasDoubleSymbol, expression, &wg, err)
-	Checker(&ctx, ExpressionStartsWithNumber, expression, &wg, err)
-	Checker(&ctx, IsValidParentheses, expression, &wg, err)
-	Checker(&ctx, HasDivizionByZero, expression, &wg, err)
-	Checker(&ctx, HasValidCharacters, expression, &wg, err)
-	Checker(&ctx, HasAtLeastOneExpression, expression, &wg, err)
-	Checker(&ctx, ContainsCorrectFloatPoint, expression, &wg, err)
+
+	go Checker(&ctx, HasDoubleSymbol, expression, &wg, errChan)
+	go Checker(&ctx, ExpressionStartsWithNumber, expression, &wg, errChan)
+	go Checker(&ctx, IsValidParentheses, expression, &wg, errChan)
+	go Checker(&ctx, HasDivizionByZero, expression, &wg, errChan)
+	go Checker(&ctx, HasValidCharacters, expression, &wg, errChan)
+	go Checker(&ctx, HasAtLeastOneExpression, expression, &wg, errChan)
+	go Checker(&ctx, ContainsCorrectFloatPoint, expression, &wg, errChan)
+
 	wg.Wait()
-	select {
-	case errChan := <-err:
-		log.Error("error with checking", slog.String("error", errChan.Error()))
-		return errChan
-	default:
+
+	if len(errChan) == 0 {
 		log.Info("successful check expression", slog.String("expr", expression))
 		return nil
+	} else {
+		err := <-errChan
+		log.Error("error with checking", slog.String("error", err.Error()))
+		return err
 	}
-
 }
 
 type ValidatorFunc func(str string) error
@@ -91,6 +123,20 @@ func HasDoubleSymbol(s string) error {
 // IsValidParentheses проверяет скобочную последовательность
 func IsValidParentheses(s string) error {
 	stack := &stack.Stack{}
+	countOpen := 0
+	countClose := 0
+
+	for _, char := range s {
+		if char == '(' {
+			countOpen++
+		} else if char == ')' {
+			countClose++
+		}
+	}
+
+	if countOpen != countClose {
+		return errors.New("expression has invalid parentheses")
+	}
 
 	for _, r := range s {
 		switch r {

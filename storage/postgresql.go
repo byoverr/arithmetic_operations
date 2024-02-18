@@ -200,6 +200,7 @@ func (s *PostgresqlDB) UpdateOperation(operation *models.Operation) error {
 }
 
 func (s *PostgresqlDB) SeedOperation(cfg *config.Config) error {
+	var databaseOperationsIsCreated = false
 	operationsInDatabase, err := s.ReadAllOperations()
 
 	if err != nil {
@@ -207,23 +208,30 @@ func (s *PostgresqlDB) SeedOperation(cfg *config.Config) error {
 	}
 
 	if len(operationsInDatabase) == cfg.Operation.CountOperation {
-		return nil
+		databaseOperationsIsCreated = true
 	}
-	fmt.Println(cfg.Operation.DurationInMilliSecondAddition, cfg.Operation.DurationInMilliSecondSubtraction, cfg.Operation.DurationInMilliSecondMultiplication, cfg.Operation.DurationInMilliSecondDivision)
+
 	operations := []*models.Operation{
 		{OperationKind: models.Addition, DurationInMilliSecond: cfg.Operation.DurationInMilliSecondAddition},
 		{OperationKind: models.Subtraction, DurationInMilliSecond: cfg.Operation.DurationInMilliSecondSubtraction},
 		{OperationKind: models.Multiplication, DurationInMilliSecond: cfg.Operation.DurationInMilliSecondMultiplication},
 		{OperationKind: models.Division, DurationInMilliSecond: cfg.Operation.DurationInMilliSecondDivision},
 	}
-
-	for _, operation := range operations {
-		err := s.CreateOperation(operation)
-		if err != nil {
-			return fmt.Errorf("failed to create operation: %w", err)
+	if databaseOperationsIsCreated {
+		for _, operation := range operations {
+			err := s.UpdateOperation(operation)
+			if err != nil {
+				return fmt.Errorf("failed to update operation: %w", err)
+			}
+		}
+	} else {
+		for _, operation := range operations {
+			err := s.CreateOperation(operation)
+			if err != nil {
+				return fmt.Errorf("failed to create operation: %w", err)
+			}
 		}
 	}
-
 	return nil
 }
 
