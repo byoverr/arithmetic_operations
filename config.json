@@ -5,12 +5,6 @@
     "idle_timeout": "60s"
   },
   "storage": {
-    "dbname": "arithmetic_operations",
-    "user": "postgres",
-    "password": "admin",
-    "host": "localhost",
-    "port": "5432",
-    "sslmode": "disable",
     "url": "postgres://postgres:admin@localhost:5432/arithmetic_operations?sslmode=disable"
   },
   "operation": {

@@ -3,13 +3,11 @@ package checker
 import (
 	"arithmetic_operations/orchestrator/topostfix"
 	"arithmetic_operations/stack"
-	"context"
 	"errors"
 	"fmt"
 	"log/slog"
 	"regexp"
 	"strings"
-	"sync"
 )
 
 // RemoveAllSpaces убирает пробелы в выражении
@@ -20,70 +18,90 @@ func RemoveAllSpaces(a string) string {
 	return noSpaces
 }
 
-// CheckExpression проверяет на все возможные ошибки
 func CheckExpression(log *slog.Logger, expression string) error {
-	var wg sync.WaitGroup
 	log.Info("start check expression", slog.String("expr", expression))
 	if len(expression) == 0 {
 		log.Error("length of expression is 0", slog.String("expr", expression))
 		return errors.New("length of expression is 0")
 	}
 	RemoveAllSpaces(expression)
-	errChan := make(chan error, 7)
-	ctx := context.Background()
-	wg.Add(7)
+	var errSlice []error
+	errSlice = append(errSlice, HasDoubleSymbol(expression))
+	errSlice = append(errSlice, ExpressionStartsWithNumber(expression))
+	errSlice = append(errSlice, IsValidParentheses(expression))
+	errSlice = append(errSlice, HasDivizionByZero(expression))
+	errSlice = append(errSlice, HasValidCharacters(expression))
+	errSlice = append(errSlice, HasAtLeastOneExpression(expression))
+	errSlice = append(errSlice, ContainsCorrectFloatPoint(expression))
 
-	go Checker(&ctx, HasDoubleSymbol, expression, &wg, errChan)
-	go Checker(&ctx, ExpressionStartsWithNumber, expression, &wg, errChan)
-	go Checker(&ctx, IsValidParentheses, expression, &wg, errChan)
-	go Checker(&ctx, HasDivizionByZero, expression, &wg, errChan)
-	go Checker(&ctx, HasValidCharacters, expression, &wg, errChan)
-	go Checker(&ctx, HasAtLeastOneExpression, expression, &wg, errChan)
-	go Checker(&ctx, ContainsCorrectFloatPoint, expression, &wg, errChan)
-
-	wg.Wait()
-
-	if len(errChan) == 0 {
-		log.Info("successful check expression", slog.String("expr", expression))
+	if len(errSlice) == 0 {
 		return nil
 	} else {
-		err := <-errChan
-		log.Error("error with checking", slog.String("error", err.Error()))
-		return err
+		return errSlice[0]
 	}
+
 }
 
-type ValidatorFunc func(str string) error
-
-func Checker(ctx *context.Context, check ValidatorFunc, expr string, wg *sync.WaitGroup, errChan chan error) {
-	defer wg.Done()
-	var err error
-	go func() {
-		select {
-		case <-(*ctx).Done():
-			return
-		default:
-			err = check(expr)
-			if err != nil {
-				errChan <- err
-				_, cancel := context.WithCancel(*ctx)
-				cancel()
-				return
-			}
-		}
-	}()
-}
+//// CheckExpression проверяет на все возможные ошибки
+//func CheckExpression(log *slog.Logger, expression string) error {
+//	var wg sync.WaitGroup
+//	log.Info("start check expression", slog.String("expr", expression))
+//	if len(expression) == 0 {
+//		log.Error("length of expression is 0", slog.String("expr", expression))
+//		return errors.New("length of expression is 0")
+//	}
+//	RemoveAllSpaces(expression)
+//	errChan := make(chan error, 7)
+//	defer close(errChan)
+//	ctx := context.Background()
+//	wg.Add(7)
+//
+//	go Checker(&ctx, HasDoubleSymbol, expression, &wg, errChan)
+//	go Checker(&ctx, ExpressionStartsWithNumber, expression, &wg, errChan)
+//	go Checker(&ctx, IsValidParentheses, expression, &wg, errChan)
+//	go Checker(&ctx, HasDivizionByZero, expression, &wg, errChan)
+//	go Checker(&ctx, HasValidCharacters, expression, &wg, errChan)
+//	go Checker(&ctx, HasAtLeastOneExpression, expression, &wg, errChan)
+//	go Checker(&ctx, ContainsCorrectFloatPoint, expression, &wg, errChan)
+//
+//	wg.Wait()
+//
+//	if len(errChan) == 0 {
+//		log.Info("successful check expression", slog.String("expr", expression))
+//		return nil
+//	} else {
+//		err := <-errChan
+//		log.Error("error with checking", slog.String("error", err.Error()))
+//		return err
+//	}
+//}
+//
+//type ValidatorFunc func(str string) error
+//
+//func Checker(ctx *context.Context, check ValidatorFunc, expr string, wg *sync.WaitGroup, errChan chan error) {
+//	defer wg.Done()
+//	var err error
+//	go func() {
+//		select {
+//		case <-(*ctx).Done():
+//			return
+//		default:
+//			err = check(expr)
+//			if err != nil {
+//				errChan <- err
+//				_, cancel := context.WithCancel(*ctx)
+//				cancel()
+//				return
+//			}
+//		}
+//	}()
+//}
 
 // HasDoubleSymbol проверяет на двойной символ
 func HasDoubleSymbol(s string) error {
-	var last rune
-	for _, r := range s {
-		if r == last {
+	for i := 0; i < len(s); i++ {
+		if i > 0 && (s[i] == '*' && s[i-1] == '*' || s[i] == '/' && s[i-1] == '/' || s[i] == '+' && s[i-1] == '+' || s[i] == '-' && s[i-1] == '-') {
 			return errors.New("expression has doubled symbol")
-		}
-		//if r == 42 || r == 43 || r == 45 || r == 47 { // +-*/
-		if r == '+' || r == '-' || r == '*' || r == '/' {
-			last = r
 		}
 	}
 	return nil

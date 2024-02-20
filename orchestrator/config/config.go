@@ -20,13 +20,7 @@ type HTTPServer struct {
 }
 
 type Storage struct {
-	User     string `mapstructure:"user"`
-	DBName   string `mapstructure:"dbname"`
-	Password string `mapstructure:"password"`
-	Host     string `mapstructure:"host"`
-	Port     string `mapstructure:"port"`
-	SSLMode  string `mapstructure:"sslmode"`
-	URL      string `mapstructure:"url"`
+	URL string `mapstructure:"url"`
 }
 
 type Operation struct {
