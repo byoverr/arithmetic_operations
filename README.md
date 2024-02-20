@@ -65,7 +65,7 @@ http://localhost:8080/
 1. Склонировать проект или скачать 
 2. Установить PostgreSQL
 3. Поменять в config.json данные о PostgreSQL(и другие если хотите)
-4. Установить все зависимости из go.mod `go mod download`
+4. Установить все зависимости из go.mod `go mod download` `go mod tidy`
 5. Включить сервер PostgreSQL
 6. Запустить файл main.go
 
