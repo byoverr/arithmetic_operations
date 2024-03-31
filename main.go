@@ -12,9 +12,13 @@ import (
 	"log/slog"
 	"net/http"
 	"os"
+	"strconv"
+	"strings"
 )
 
 func main() {
+	var undoneTasksIDs []string
+
 	cfg := config.Load()
 	opts := prettylogger.PrettyHandlerOptions{
 		SlogOpts: slog.HandlerOptions{
@@ -43,6 +47,28 @@ func main() {
 
 	logger.Info("start server", slog.String("address", cfg.HTTPServer.Address))
 
+	undoneTasks, err := repo.ReadAllExpressionsUndone()
+	if err != nil {
+		logger.Error("problem with database", slog.String("error", err.Error()))
+		log.Fatal(err)
+	}
+
+	operations, err := repo.ReadAllOperations()
+	if err != nil {
+		logger.Error("problem with database", slog.String("error", err.Error()))
+		log.Fatal(err)
+	}
+
+	for _, task := range undoneTasks {
+		agents.CreateTask(task, operations)
+		undoneTasksIDs = append(undoneTasksIDs, strconv.Itoa(task.Id))
+	}
+
+	if len(undoneTasksIDs) > 0 {
+		logger.Info("undone tasks added", slog.String("id", strings.Join(undoneTasksIDs, ", ")))
+	} else {
+		logger.Info("no undone tasks")
+	}
 	srv := &http.Server{
 		Addr:         cfg.HTTPServer.Address,
 		Handler:      router,
@@ -58,10 +84,12 @@ func main() {
 
 func setURLPatterns(router *chi.Mux, logger *slog.Logger, repo *storage.PostgresqlDB, agents *agent.Calculator) {
 	router.Post("/expression", handlers.HandlerCreateExpression(logger, repo.CreateExpression,
-		repo.ReadAllOperations, repo.ReadAllExpressionsUndone, agents))
+		repo.ReadAllOperations, agents))
 	router.Get("/expression", handlers.HandlerGetAllExpression(logger, repo.ReadAllExpressions))
 	router.Get("/expression/{id}", handlers.HandlerGetExpression(logger, repo.ReadExpression))
 	router.Get("/operation", handlers.HandlerGetAllOperations(logger, repo.ReadAllOperations))
 	router.Put("/operation", handlers.HandlerPutOperations(logger, repo.UpdateOperation))
+	router.Put("/agent", handlers.HandlerAddAgent(logger, agents))
+	router.Delete("/agent", handlers.HandlerRemoveAgent(logger, agents))
 	router.Get("/agents", handlers.HandlerGetAllAgents(logger, agents))
 }

@@ -6,6 +6,7 @@ import (
 	"arithmetic_operations/orchestrator/models"
 	"database/sql"
 	"errors"
+	"fmt"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
 	"log/slog"
@@ -13,7 +14,7 @@ import (
 	"strconv"
 )
 
-func HandlerCreateExpression(log *slog.Logger, expressionSaver func(expression *models.Expression) error, operationreader func() ([]*models.Operation, error), undoneExpressionsReader func() ([]*models.Expression, error), agents *agent.Calculator) http.HandlerFunc {
+func HandlerCreateExpression(log *slog.Logger, expressionSaver func(expression *models.Expression) error, operationreader func() ([]*models.Operation, error), agents *agent.Calculator) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var inputExpression models.InputExpression
 		var expression *models.Expression
@@ -71,21 +72,11 @@ func HandlerCreateExpression(log *slog.Logger, expressionSaver func(expression *
 
 			return
 		}
-		//_, errDb = undoneExpressionsReader()
-		//if errDb != nil {
-		//	log.Error("problem with database", slog.String("error", errDb.Error()))
-		//
-		//	jsonError := models.NewError("problem with database")
-		//
-		//	render.Status(r, http.StatusInternalServerError)
-		//	render.JSON(w, r, jsonError)
-		//
-		//	return
-		//}
 		render.Status(r, http.StatusOK)
 		render.JSON(w, r, expression)
+
 		log.Info("expression added", slog.Int("id", expression.Id))
-		agent.CreateTask(agents, expression, operations)
+		agents.CreateTask(expression, operations)
 		log.Info("task created")
 	}
 }
@@ -194,6 +185,33 @@ func HandlerPutOperations(log *slog.Logger, operationUpdate func(operation *mode
 
 		log.Info("successful to update operation")
 		w.WriteHeader(http.StatusOK)
+	}
+}
+
+func HandlerAddAgent(log *slog.Logger, calc *agent.Calculator) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+
+		calc.AddAgent()
+		log.Info("successful to add agent")
+		render.Status(r, http.StatusOK)
+		render.JSON(w, r, fmt.Sprintf("{'count_of_agents': %d}", len(calc.Agents)))
+	}
+}
+
+func HandlerRemoveAgent(log *slog.Logger, calc *agent.Calculator) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		log.Info("start removing agent")
+
+		err := calc.RemoveAgent()
+		if err != nil {
+			log.Error("error with removing: %s", err)
+			render.Status(r, http.StatusBadRequest)
+			render.JSON(w, r, models.NewError("error with removing agent (you have only one)"))
+			return
+		}
+		log.Info("successful to remove agent")
+		render.Status(r, http.StatusOK)
+		render.JSON(w, r, fmt.Sprintf("{'count_of_agents': %d}", calc.NumberOfAgents))
 	}
 }
 
