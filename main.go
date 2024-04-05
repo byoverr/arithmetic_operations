@@ -2,6 +2,7 @@ package main
 
 import (
 	"arithmetic_operations/agent"
+	"arithmetic_operations/orchestrator/auth"
 	"arithmetic_operations/orchestrator/config"
 	"arithmetic_operations/orchestrator/handlers"
 	"arithmetic_operations/orchestrator/prettylogger"
@@ -22,7 +23,7 @@ func main() {
 	cfg := config.Load()
 	opts := prettylogger.PrettyHandlerOptions{
 		SlogOpts: slog.HandlerOptions{
-			Level: slog.LevelDebug,
+			Level: slog.LevelInfo,
 		},
 	}
 	handler := prettylogger.NewPrettyHandler(os.Stdout, opts)
@@ -39,14 +40,16 @@ func main() {
 	}
 	agents.CheckerForNewTasks(repo.UpdateExpression)
 
+	authService := auth.NewAuthService(logger, repo, cfg.AuthService.TokenTTL, cfg.AuthService.Secret, cfg.AuthService.Cost)
+
 	router := chi.NewRouter()
 	router.Use(middleware.Logger)
 	router.Use(middleware.Recoverer)
 	router.Use(middleware.URLFormat)
-	setURLPatterns(router, logger, repo, agents)
+	handlers.InitRoutes(router, logger, repo, agents, authService)
 
 	logger.Info("start server", slog.String("address", cfg.HTTPServer.Address))
-
+	// TODO: hide this shown down
 	undoneTasks, err := repo.ReadAllExpressionsUndone()
 	if err != nil {
 		logger.Error("problem with database", slog.String("error", err.Error()))
@@ -80,16 +83,5 @@ func main() {
 	if err := srv.ListenAndServe(); err != nil {
 		logger.Error("failed to start")
 	}
-}
-
-func setURLPatterns(router *chi.Mux, logger *slog.Logger, repo *storage.PostgresqlDB, agents *agent.Calculator) {
-	router.Post("/expression", handlers.HandlerCreateExpression(logger, repo.CreateExpression,
-		repo.ReadAllOperations, agents))
-	router.Get("/expression", handlers.HandlerGetAllExpression(logger, repo.ReadAllExpressions))
-	router.Get("/expression/{id}", handlers.HandlerGetExpression(logger, repo.ReadExpression))
-	router.Get("/operation", handlers.HandlerGetAllOperations(logger, repo.ReadAllOperations))
-	router.Put("/operation", handlers.HandlerPutOperations(logger, repo.UpdateOperation))
-	router.Put("/agent", handlers.HandlerAddAgent(logger, agents))
-	router.Delete("/agent", handlers.HandlerRemoveAgent(logger, agents))
-	router.Get("/agents", handlers.HandlerGetAllAgents(logger, agents))
+	// TODO: add pure shutdown
 }

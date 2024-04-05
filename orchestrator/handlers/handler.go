@@ -3,6 +3,7 @@ package handlers
 import (
 	"arithmetic_operations/agent"
 	"arithmetic_operations/checker"
+	"arithmetic_operations/orchestrator/auth"
 	"arithmetic_operations/orchestrator/models"
 	"database/sql"
 	"errors"
@@ -225,3 +226,112 @@ func HandlerGetAllAgents(log *slog.Logger, calc *agent.Calculator) http.HandlerF
 		render.JSON(w, r, agents)
 	}
 }
+
+func HandlerRegisterUser(log *slog.Logger, auth *auth.AuthService) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		var inputUser models.RegisterUser
+
+		err := render.DecodeJSON(r.Body, &inputUser)
+
+		if err != nil {
+			jsonError := models.NewError("incorrect JSON file")
+			log.Error("incorrect JSON file: %s", err)
+			render.Status(r, http.StatusBadRequest)
+			render.JSON(w, r, jsonError)
+
+			return
+		}
+		log.Info("request body decoded")
+
+		errValidating := checker.CheckUser(log, &inputUser)
+		if errValidating != nil {
+			log.Error("error with checking user", slog.String("error", errValidating.Error()))
+			jsonError := models.NewError(errValidating.Error())
+			render.Status(r, http.StatusBadRequest)
+			render.JSON(w, r, jsonError)
+			return
+		}
+		id, err := auth.Register(inputUser.Username, inputUser.Password)
+		if err != nil {
+			log.Error("error with register user", slog.String("error", err.Error()))
+			jsonError := models.NewError(err.Error())
+			render.Status(r, http.StatusBadRequest)
+			render.JSON(w, r, jsonError)
+			return
+		}
+		log.Info("successful to register user")
+		w.WriteHeader(http.StatusOK)
+		render.JSON(w, r, map[string]interface{}{"id": id})
+
+	}
+}
+
+func HandlerLoginUser(log *slog.Logger, auth *auth.AuthService) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		var inputUser models.RegisterUser
+
+		err := render.DecodeJSON(r.Body, &inputUser)
+
+		if err != nil {
+			jsonError := models.NewError("incorrect JSON file")
+			log.Error("incorrect JSON file: %s", err)
+			render.Status(r, http.StatusBadRequest)
+			render.JSON(w, r, jsonError)
+
+			return
+		}
+		log.Debug("request body decoded")
+
+		errValidating := checker.CheckUser(log, &inputUser)
+		if errValidating != nil {
+			log.Error("error with checking user", slog.String("error", errValidating.Error()))
+			jsonError := models.NewError(errValidating.Error())
+			render.Status(r, http.StatusBadRequest)
+			render.JSON(w, r, jsonError)
+			return
+		}
+		token, err := auth.Login(inputUser.Username, inputUser.Password)
+		if err != nil {
+			log.Error("error with register user", slog.String("error", err.Error()))
+			jsonError := models.NewError(err.Error())
+			render.Status(r, http.StatusBadRequest)
+			render.JSON(w, r, jsonError)
+			return
+		}
+		log.Info("successful to login user")
+
+		w.Header().Add("Authorization", token)
+		w.WriteHeader(http.StatusOK)
+
+		render.JSON(w, r, map[string]interface{}{"token": token})
+
+	}
+
+}
+
+//func (h *Handler) userIdentity(c *gin.Context) {
+//	header := c.GetHeader(authorizationHeader)
+//	if header == "" {
+//		newErrorResponse(c, http.StatusUnauthorized, "empty auth header")
+//		return
+//	}
+//
+//	headerParts := strings.Split(header, " ")
+//	if len(headerParts) != 2 || headerParts[0] != "Bearer" {
+//		newErrorResponse(c, http.StatusUnauthorized, "invalid auth header")
+//		return
+//	}
+//
+//	if len(headerParts[1]) == 0 {
+//		newErrorResponse(c, http.StatusUnauthorized, "token is empty")
+//		return
+//	}
+//
+//	userId, err := h.services.Authorization.ParseToken(headerParts[1])
+//	if err != nil {
+//		newErrorResponse(c, http.StatusUnauthorized, err.Error())
+//		return
+//	}
+//
+//	c.Set(userCtx, userId)
+//}

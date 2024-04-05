@@ -2,14 +2,6 @@ package models
 
 import "time"
 
-type Error struct {
-	Error string `json:"error"`
-}
-
-func NewError(s string) *Error {
-	return &Error{Error: s}
-}
-
 type Expression struct {
 	Id          int        `json:"id"`
 	Expression  string     `json:"expression"`
@@ -17,6 +9,7 @@ type Expression struct {
 	Status      Status     `json:"status"`
 	CreatedAt   time.Time  `json:"createdAt"`
 	CompletedAt *time.Time `json:"completedAt,omitempty"`
+	UserId      int64      `json:"userId"`
 }
 
 type SubExpression struct {
@@ -52,32 +45,3 @@ func NewExpression(expression string) *Expression {
 		CreatedAt:  time.Now(),
 	}
 }
-
-type Operation struct {
-	OperationKind         OperationType `json:"operationKind" validate:"required"`
-	DurationInMilliSecond int           `json:"durationInMilliSecond" validate:"duration_in_millisec,required"`
-}
-
-func IsAllowedOperation(operationType OperationType) bool {
-	return operationType == Addition ||
-		operationType == Subtraction ||
-		operationType == Multiplication ||
-		operationType == Division
-}
-
-type OperationType string
-
-const (
-	Addition       OperationType = "addition"
-	Subtraction                  = "subtraction"
-	Multiplication               = "multiplication"
-	Division                     = "division"
-)
-
-type Status string
-
-const (
-	Completed Status = "completed"
-	InProcess        = "in process"
-	Invalid          = "invalid"
-)

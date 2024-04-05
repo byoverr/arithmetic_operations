@@ -7,10 +7,11 @@ import (
 )
 
 type Config struct {
-	HTTPServer HTTPServer `mapstructure:"http_server"`
-	Storage    Storage    `mapstructure:"storage"`
-	Operation  Operation  `mapstructure:"operation"`
-	Agent      Agent      `mapstructure:"agents"`
+	HTTPServer  HTTPServer  `mapstructure:"http_server"`
+	Storage     Storage     `mapstructure:"storage"`
+	Operation   Operation   `mapstructure:"operation"`
+	Agent       Agent       `mapstructure:"agents"`
+	AuthService AuthService `mapstructure:"auth_service"`
 }
 
 type HTTPServer struct {
@@ -35,12 +36,18 @@ type Agent struct {
 	CountOfAgents int `mapstructure:"count_of_agents"`
 }
 
+type AuthService struct {
+	Cost     int           `mapstructure:"cost"`
+	Secret   string        `mapstructure:"secret"`
+	TokenTTL time.Duration `mapstructure:"token_ttl"`
+}
+
 func Load() *Config {
 	v := viper.New()
 
 	v.AddConfigPath(".")
-	viper.SetConfigName("config")
-	viper.SetConfigType("json")
+	v.SetConfigName("config")
+	v.SetConfigType("json")
 
 	if err := v.ReadInConfig(); err != nil {
 		log.Fatalf("couldn't load config: %s", err)
