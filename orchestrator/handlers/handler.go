@@ -260,7 +260,7 @@ func HandlerRegisterUser(log *slog.Logger, auth *auth.AuthService) http.HandlerF
 			return
 		}
 		log.Info("successful to register user")
-		w.WriteHeader(http.StatusOK)
+		w.WriteHeader(http.StatusCreated)
 		render.JSON(w, r, map[string]interface{}{"id": id})
 
 	}

@@ -2,7 +2,7 @@ package auth
 
 import (
 	"arithmetic_operations/orchestrator/models"
-	"errors"
+	"fmt"
 	"github.com/golang-jwt/jwt/v5"
 	"time"
 )
@@ -48,10 +48,16 @@ func ValidateToken(signedToken, secret string) error {
 
 	claims, ok := token.Claims.(*tokenClaims)
 	if !ok {
-		return errors.New("couldn't parse claims")
+		return fmt.Errorf("couldn't parse claims")
 	}
 	if claims.ExpiresAt.Unix() < time.Now().Unix() {
-		return errors.New("token expired")
+		duration := time.Since(time.Unix(time.Now().Unix()-claims.ExpiresAt.Unix(), 0))
+
+		// Extract hours and minutes from the duration
+		hours := int(duration.Hours())
+		minutes := int(duration.Minutes()) % 60
+		seconds := int(duration.Seconds()) % 60
+		return fmt.Errorf("token expired by %dh %dmin %dsec", hours, minutes, seconds)
 	}
 
 	return nil
