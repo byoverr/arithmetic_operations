@@ -1,7 +1,7 @@
 package storage
 
 import (
-	"arithmetic_operations/orchestrator/config"
+	"arithmetic_operations/internal/config"
 	"context"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"log"

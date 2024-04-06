@@ -1,8 +1,8 @@
 package agent
 
 import (
-	"arithmetic_operations/orchestrator/models"
-	"arithmetic_operations/orchestrator/topostfix"
+	"arithmetic_operations/internal/models"
+	"arithmetic_operations/internal/topostfix"
 	"errors"
 	"log"
 	"log/slog"

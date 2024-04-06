@@ -1,8 +1,8 @@
 package auth
 
 import (
-	"arithmetic_operations/orchestrator/models"
-	"arithmetic_operations/storage"
+	"arithmetic_operations/internal/models"
+	"arithmetic_operations/internal/storage"
 	"fmt"
 	"log/slog"
 	"time"

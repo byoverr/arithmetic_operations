@@ -1,9 +1,9 @@
 package handlers
 
 import (
-	"arithmetic_operations/agent"
-	"arithmetic_operations/orchestrator/auth"
-	"arithmetic_operations/storage"
+	"arithmetic_operations/internal/agent"
+	"arithmetic_operations/internal/auth"
+	"arithmetic_operations/internal/storage"
 	"github.com/go-chi/chi/v5"
 	"log/slog"
 )

@@ -1,7 +1,7 @@
 package checker
 
 import (
-	"arithmetic_operations/orchestrator/models"
+	"arithmetic_operations/internal/models"
 	"errors"
 )
 

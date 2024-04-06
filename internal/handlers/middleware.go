@@ -1,8 +1,8 @@
 package handlers
 
 import (
-	"arithmetic_operations/orchestrator/auth"
-	"arithmetic_operations/orchestrator/models"
+	"arithmetic_operations/internal/auth"
+	"arithmetic_operations/internal/models"
 	"github.com/go-chi/render"
 	"github.com/spf13/viper"
 	"log/slog"

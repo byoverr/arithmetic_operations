@@ -1,7 +1,7 @@
 package topostfix
 
 import (
-	"arithmetic_operations/stack"
+	"arithmetic_operations/internal/stack"
 	"strings"
 )
 

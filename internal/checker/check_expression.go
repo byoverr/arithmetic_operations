@@ -1,8 +1,8 @@
 package checker
 
 import (
-	"arithmetic_operations/orchestrator/topostfix"
-	"arithmetic_operations/stack"
+	"arithmetic_operations/internal/stack"
+	"arithmetic_operations/internal/topostfix"
 	"errors"
 	"fmt"
 	"log/slog"

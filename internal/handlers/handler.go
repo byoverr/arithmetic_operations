@@ -1,10 +1,10 @@
 package handlers
 
 import (
-	"arithmetic_operations/agent"
-	"arithmetic_operations/checker"
-	"arithmetic_operations/orchestrator/auth"
-	"arithmetic_operations/orchestrator/models"
+	"arithmetic_operations/internal/agent"
+	"arithmetic_operations/internal/auth"
+	checker2 "arithmetic_operations/internal/checker"
+	"arithmetic_operations/internal/models"
 	"database/sql"
 	"errors"
 	"fmt"
@@ -33,14 +33,14 @@ func HandlerCreateExpression(log *slog.Logger, expressionSaver func(expression *
 
 		log.Info("request body decoded")
 
-		errValidating := checker.CheckExpression(log, inputExpression.Expression)
+		errValidating := checker2.CheckExpression(log, inputExpression.Expression)
 
 		if errValidating != nil {
 			expression = models.NewExpressionInvalid(inputExpression.Expression)
 		} else {
 			expression = models.NewExpressionInProcess(inputExpression.Expression)
 		}
-		expression.Expression = checker.RemoveAllSpaces(expression.Expression)
+		expression.Expression = checker2.RemoveAllSpaces(expression.Expression)
 		if errValidating != nil {
 			jsonError := models.NewError(errValidating.Error())
 			render.Status(r, http.StatusBadRequest)
@@ -167,7 +167,7 @@ func HandlerPutOperations(log *slog.Logger, operationUpdate func(operation *mode
 
 		log.Info("request body decoded")
 
-		errValidating := checker.ValidateOperation(operation)
+		errValidating := checker2.ValidateOperation(operation)
 
 		if errValidating != nil {
 			log.Error("error with validating operation", operation, slog.String("error", errValidating.Error()))
@@ -243,7 +243,7 @@ func HandlerRegisterUser(log *slog.Logger, auth *auth.AuthService) http.HandlerF
 		}
 		log.Info("request body decoded")
 
-		errValidating := checker.CheckUser(log, &inputUser)
+		errValidating := checker2.CheckUser(log, &inputUser)
 		if errValidating != nil {
 			log.Error("error with checking user", slog.String("error", errValidating.Error()))
 			jsonError := models.NewError(errValidating.Error())
@@ -282,7 +282,7 @@ func HandlerLoginUser(log *slog.Logger, auth *auth.AuthService) http.HandlerFunc
 		}
 		log.Debug("request body decoded")
 
-		errValidating := checker.CheckUser(log, &inputUser)
+		errValidating := checker2.CheckUser(log, &inputUser)
 		if errValidating != nil {
 			log.Error("error with checking user", slog.String("error", errValidating.Error()))
 			jsonError := models.NewError(errValidating.Error())

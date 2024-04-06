@@ -1,12 +1,12 @@
 package main
 
 import (
-	"arithmetic_operations/agent"
-	"arithmetic_operations/orchestrator/auth"
-	"arithmetic_operations/orchestrator/config"
-	"arithmetic_operations/orchestrator/handlers"
-	"arithmetic_operations/orchestrator/prettylogger"
-	"arithmetic_operations/storage"
+	"arithmetic_operations/internal/agent"
+	"arithmetic_operations/internal/auth"
+	"arithmetic_operations/internal/config"
+	"arithmetic_operations/internal/handlers"
+	"arithmetic_operations/internal/prettylogger"
+	"arithmetic_operations/internal/storage"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"log"

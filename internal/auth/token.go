@@ -1,7 +1,7 @@
 package auth
 
 import (
-	"arithmetic_operations/orchestrator/models"
+	"arithmetic_operations/internal/models"
 	"fmt"
 	"github.com/golang-jwt/jwt/v5"
 	"time"

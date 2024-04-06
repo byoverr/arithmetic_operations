@@ -1,7 +1,7 @@
 package storage
 
 import (
-	"arithmetic_operations/orchestrator/models"
+	"arithmetic_operations/internal/models"
 	"context"
 	"errors"
 	"fmt"

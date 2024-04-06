@@ -1,8 +1,8 @@
 package storage
 
 import (
-	"arithmetic_operations/orchestrator/config"
-	"arithmetic_operations/orchestrator/models"
+	"arithmetic_operations/internal/config"
+	"arithmetic_operations/internal/models"
 	"context"
 	"fmt"
 )

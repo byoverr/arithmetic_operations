@@ -142,7 +142,7 @@ http://localhost:8080/
     "expression": "(2+2)*2"
 }
 ```
-![alt tag](https://github.com/byoverr/arithmetic_operations/blob/main/img/example.png "Пример")
+![alt tag](https://github.com/byoverr/arithmetic_operations/blob/main/docs/img/example.png "Пример")
 - `http://localhost:8080/expression` метод GET - получаем все выражения
 - `http://localhost:8080/expression/1` метод GET - получаем выражение с id = 1
 - `http://localhost:8080/operation` метод GET - получаем все операции(длительность операции)
@@ -158,7 +158,7 @@ http://localhost:8080/
 - `http://localhost:8080/agents` метод GET - получаем всех агентов
 ## Как это все работает:
 
-![alt tag](https://github.com/byoverr/arithmetic_operations/blob/main/img/scheme.png "Схемка")
+![alt tag](https://github.com/byoverr/arithmetic_operations/blob/main/docs/img/scheme.png "Схемка")
 
 
 У нас читается конфиг с файла config.json, инициализируется БД, chi роутер, выполняются непосчитанные выражения и привязываются паттерны. По вызванному паттерну есть хендлер в котором обрабатывается запрос и идет работа с БД, создаются таски с выражениями и длительностью операций. Всё обрабатывается и возвращается ответ.

@@ -1,7 +1,7 @@
 package topostfix
 
 import (
-	"arithmetic_operations/orchestrator/models"
+	"arithmetic_operations/internal/models"
 	"crypto/rand"
 	"encoding/hex"
 	"errors"
