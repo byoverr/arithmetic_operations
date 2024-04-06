@@ -18,6 +18,7 @@ func RemoveAllSpaces(a string) string {
 	return noSpaces
 }
 
+// CheckExpression проверяет на все возможные ошибки
 func CheckExpression(log *slog.Logger, expression string) error {
 	log.Info("start check expression", slog.String("expr", expression))
 	if len(expression) == 0 {
@@ -41,61 +42,6 @@ func CheckExpression(log *slog.Logger, expression string) error {
 	}
 
 }
-
-//// CheckExpression проверяет на все возможные ошибки
-//func CheckExpression(log *slog.Logger, expression string) error {
-//	var wg sync.WaitGroup
-//	log.Info("start check expression", slog.String("expr", expression))
-//	if len(expression) == 0 {
-//		log.Error("length of expression is 0", slog.String("expr", expression))
-//		return errors.New("length of expression is 0")
-//	}
-//	RemoveAllSpaces(expression)
-//	errChan := make(chan error, 7)
-//	defer close(errChan)
-//	ctx := context.Background()
-//	wg.Add(7)
-//
-//	go Checker(&ctx, HasDoubleSymbol, expression, &wg, errChan)
-//	go Checker(&ctx, ExpressionStartsWithNumber, expression, &wg, errChan)
-//	go Checker(&ctx, IsValidParentheses, expression, &wg, errChan)
-//	go Checker(&ctx, HasDivizionByZero, expression, &wg, errChan)
-//	go Checker(&ctx, HasValidCharacters, expression, &wg, errChan)
-//	go Checker(&ctx, HasAtLeastOneExpression, expression, &wg, errChan)
-//	go Checker(&ctx, ContainsCorrectFloatPoint, expression, &wg, errChan)
-//
-//	wg.Wait()
-//
-//	if len(errChan) == 0 {
-//		log.Info("successful check expression", slog.String("expr", expression))
-//		return nil
-//	} else {
-//		err := <-errChan
-//		log.Error("error with checking", slog.String("error", err.Error()))
-//		return err
-//	}
-//}
-//
-//type ValidatorFunc func(str string) error
-//
-//func Checker(ctx *context.Context, check ValidatorFunc, expr string, wg *sync.WaitGroup, errChan chan error) {
-//	defer wg.Done()
-//	var err error
-//	go func() {
-//		select {
-//		case <-(*ctx).Done():
-//			return
-//		default:
-//			err = check(expr)
-//			if err != nil {
-//				errChan <- err
-//				_, cancel := context.WithCancel(*ctx)
-//				cancel()
-//				return
-//			}
-//		}
-//	}()
-//}
 
 // HasDoubleSymbol проверяет на двойной символ
 func HasDoubleSymbol(s string) error {
@@ -185,10 +131,7 @@ func ContainsCorrectFloatPoint(expr string) error {
 func HasAtLeastOneExpression(expr string) error {
 	// Regular expression to match the pattern "number operator number"
 	pattern := `\d+\s*[\+\-\*/]\s*\d+`
-	r, err := regexp.Compile(pattern)
-	if err != nil {
-		return err
-	}
+	r := regexp.MustCompile(pattern)
 	// Check if the expression contains at least one match
 	matched := r.MatchString(expr)
 	if matched {
@@ -211,9 +154,3 @@ func ExpressionStartsWithNumber(expr string) error {
 	}
 
 }
-
-// */+- - двойная штука - ошибка - выполнил
-// ( больше чем ) - тоже ошибка - выполнил
-// деление на ноль - выполнил
-// проверка на символы допустимые - выполнил
-// разделение на выражения ((2+2) +2) + 2
