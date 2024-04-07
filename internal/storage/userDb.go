@@ -27,7 +27,7 @@ func (s *PostgresqlDB) GetUser(username string) (*models.User, error) {
 	err := row.Scan(&user.Id, &user.Username, &user.HashPassword, &user.CreatedAt)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return nil, fmt.Errorf("no user found with username %d: %w", username, err)
+			return nil, fmt.Errorf("no user found with username %s: %w", username, err)
 		}
 		return nil, fmt.Errorf("failed to scan row into user: %w", err)
 	}
