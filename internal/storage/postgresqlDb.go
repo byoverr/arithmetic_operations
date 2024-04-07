@@ -7,13 +7,13 @@ import (
 	"log"
 )
 
-type PgxIface interface {
-	Begin(context.Context, *config.Config) (*PostgresqlDB, error)
-	Close(context.Context) error
+type PostgresqlDB struct {
+	db  *pgxpool.Pool
+	ctx context.Context
 }
 
-func (s *PostgresqlDB) Begin(ctx context.Context, cfg *config.Config) (*PostgresqlDB, error) {
-	db, err := pgxpool.New(context.Background(), cfg.Storage.URL)
+func PostgresqlOpen(cfg *config.Config, ctx context.Context) (*PostgresqlDB, error) {
+	db, err := pgxpool.New(ctx, cfg.Storage.URL)
 	if err != nil {
 		log.Fatalf("Unable to connection to database: %v\n", err)
 		return nil, err
@@ -23,21 +23,6 @@ func (s *PostgresqlDB) Begin(ctx context.Context, cfg *config.Config) (*Postgres
 	}
 
 	postgresql := &PostgresqlDB{db: db}
-	return postgresql, err
-}
-func (s *PostgresqlDB) Close(ctx context.Context) error {
-	// Закрываем пул соединений с базой данных
-	s.db.Close()
-	return nil
-}
-
-type PostgresqlDB struct {
-	db *pgxpool.Pool
-}
-
-func PostgresqlOpen(cfg *config.Config) (*PostgresqlDB, error) {
-	db := &PostgresqlDB{}
-	postgresql, err := db.Begin(context.Background(), cfg)
 
 	err = postgresql.Init(cfg)
 

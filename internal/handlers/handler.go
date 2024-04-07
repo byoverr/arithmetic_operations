@@ -59,7 +59,7 @@ func HandlerCreateExpression(log *slog.Logger, expressionSaver func(expression *
 
 			return
 		} else {
-			log.Info("added expression to db", expression)
+			log.Info("added expression to db", slog.Any("expression", expression))
 		}
 
 		operations, errDb := operationreader()
@@ -137,8 +137,8 @@ func HandlerGetAllOperations(log *slog.Logger, operationReader func() ([]*models
 
 		operations, err := operationReader()
 
-		if errors.Is(err, sql.ErrNoRows) {
-			log.Error("error to get operations: %s", err)
+		if err != nil {
+			log.Error("error to get operations: ", slog.String("error", err.Error()))
 			render.Status(r, http.StatusInternalServerError)
 			render.JSON(w, r, models.NewError("no operations"))
 			return
@@ -170,7 +170,7 @@ func HandlerPutOperations(log *slog.Logger, operationUpdate func(operation *mode
 		errValidating := checker2.ValidateOperation(operation)
 
 		if errValidating != nil {
-			log.Error("error with validating operation", operation, slog.String("error", errValidating.Error()))
+			log.Error("error with validating operation", slog.String("error", errValidating.Error()))
 			render.Status(r, http.StatusInternalServerError)
 			render.JSON(w, r, models.NewError(errValidating.Error()))
 			return
@@ -179,7 +179,7 @@ func HandlerPutOperations(log *slog.Logger, operationUpdate func(operation *mode
 		errDb := operationUpdate(&operation)
 
 		if errDb != nil {
-			log.Error("could not update operation: ", operation, slog.String("errorDb", errDb.Error()))
+			log.Error("could not update operation: ", slog.String("errorDb", errDb.Error()))
 			render.Status(r, http.StatusInternalServerError)
 			render.JSON(w, r, models.NewError("could not update operation"))
 		}

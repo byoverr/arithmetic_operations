@@ -7,6 +7,7 @@ import (
 	"arithmetic_operations/internal/handlers"
 	"arithmetic_operations/internal/prettylogger"
 	"arithmetic_operations/internal/storage"
+	"context"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"log"
@@ -19,7 +20,7 @@ import (
 
 func main() {
 	var undoneTasksIDs []string
-
+	ctx := context.Background()
 	cfg := config.Load()
 	opts := prettylogger.PrettyHandlerOptions{
 		SlogOpts: slog.HandlerOptions{
@@ -30,7 +31,7 @@ func main() {
 	//logger := slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelDebug}))
 	logger := slog.New(handler)
 
-	repo, err := storage.PostgresqlOpen(cfg)
+	repo, err := storage.PostgresqlOpen(cfg, ctx)
 	if err != nil {
 		log.Fatal(err)
 	}
