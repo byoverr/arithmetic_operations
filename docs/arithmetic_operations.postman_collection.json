@@ -1,0 +1,606 @@
+{
+	"info": {
+		"_postman_id": "3b27b03d-0121-4a91-a1c3-25bb9a3c49b8",
+		"name": "arithmetic_operations",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "34198269"
+	},
+	"item": [
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Valid register",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"someuser@email.com\",\n    \"password\": \"Qwerty_123\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/register",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Register with incorrect name",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"bebe\",\n    \"password\": \"Qwerty_123\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/register",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Register with incorrect password",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"someuser@email.com\",\n    \"password\": \"Qwerty\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/register",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"someuser@email.com\",\n    \"password\": \"Qwerty_123\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/login",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"login"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "(LOG IN AND SET IN AUTH CORRECT TOKEN)",
+			"item": [
+				{
+					"name": "Expression",
+					"item": [
+						{
+							"name": "Create invalid expression",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywidXNlcm5hbWUiOiJzb21ldXNlckBlbWFpbC5jb20iLCJleHAiOjE3MTI3NzY1NjEsImlhdCI6MTcxMjc3Mjk2MX0.tsJWMK1v15VEp2KKvuV6J_v1LRom88AiR3mY8GfGan4",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "X-Idempotency-Token",
+										"value": "token",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"expression\": \"2/(2+3-5)\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8080/expression",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"expression"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create valid expression",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywidXNlcm5hbWUiOiJzb21ldXNlckBlbWFpbC5jb20iLCJleHAiOjE3MTI3NzY1NjEsImlhdCI6MTcxMjc3Mjk2MX0.tsJWMK1v15VEp2KKvuV6J_v1LRom88AiR3mY8GfGan4",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "X-Idempotency-Token",
+										"value": "token",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"expression\": \"(2+2)*2\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8080/expression",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"expression"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get all expressions",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywidXNlcm5hbWUiOiJzb21ldXNlckBlbWFpbC5jb20iLCJleHAiOjE3MTI3NzY1NjEsImlhdCI6MTcxMjc3Mjk2MX0.tsJWMK1v15VEp2KKvuV6J_v1LRom88AiR3mY8GfGan4",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8080/expression",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"expression"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get expression with id = 1",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywidXNlcm5hbWUiOiJzb21ldXNlckBlbWFpbC5jb20iLCJleHAiOjE3MTI3NzY1NjEsImlhdCI6MTcxMjc3Mjk2MX0.tsJWMK1v15VEp2KKvuV6J_v1LRom88AiR3mY8GfGan4",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8080/expression/1",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"expression",
+										"1"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Operation",
+					"item": [
+						{
+							"name": "Get all operations",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywidXNlcm5hbWUiOiJzb21ldXNlckBlbWFpbC5jb20iLCJleHAiOjE3MTI3NzY1NjEsImlhdCI6MTcxMjc3Mjk2MX0.tsJWMK1v15VEp2KKvuV6J_v1LRom88AiR3mY8GfGan4",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8080/operation",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"operation"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Incorrect update operation",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywidXNlcm5hbWUiOiJzb21ldXNlckBlbWFpbC5jb20iLCJleHAiOjE3MTI3NzY1NjEsImlhdCI6MTcxMjc3Mjk2MX0.tsJWMK1v15VEp2KKvuV6J_v1LRom88AiR3mY8GfGan4",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"OperationKind\": \"bebebe\",\n    \"DurationInMillisecond\": 1\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8080/operation",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"operation"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update operation addition",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywidXNlcm5hbWUiOiJzb21ldXNlckBlbWFpbC5jb20iLCJleHAiOjE3MTI3NzY1NjEsImlhdCI6MTcxMjc3Mjk2MX0.tsJWMK1v15VEp2KKvuV6J_v1LRom88AiR3mY8GfGan4",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n   \"OperationKind\": \"addition\",\n   \"durationInMilliSecond\": 2000\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8080/operation",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"operation"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update operation multiplication",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywidXNlcm5hbWUiOiJzb21ldXNlckBlbWFpbC5jb20iLCJleHAiOjE3MTI3NzY1NjEsImlhdCI6MTcxMjc3Mjk2MX0.tsJWMK1v15VEp2KKvuV6J_v1LRom88AiR3mY8GfGan4",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n   \"OperationKind\": \"multiplication\",\n   \"durationInMilliSecond\": 2000\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8080/operation",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"operation"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update operation division",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywidXNlcm5hbWUiOiJzb21ldXNlckBlbWFpbC5jb20iLCJleHAiOjE3MTI3NzY1NjEsImlhdCI6MTcxMjc3Mjk2MX0.tsJWMK1v15VEp2KKvuV6J_v1LRom88AiR3mY8GfGan4",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n   \"OperationKind\": \"division\",\n   \"durationInMilliSecond\": 2000\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8080/operation",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"operation"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update operation subtraction",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywidXNlcm5hbWUiOiJzb21ldXNlckBlbWFpbC5jb20iLCJleHAiOjE3MTI3NzY1NjEsImlhdCI6MTcxMjc3Mjk2MX0.tsJWMK1v15VEp2KKvuV6J_v1LRom88AiR3mY8GfGan4",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n   \"OperationKind\": \"subtraction\",\n   \"durationInMilliSecond\": 2000\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8080/operation",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"operation"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Agent",
+					"item": [
+						{
+							"name": "Get all agents",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywidXNlcm5hbWUiOiJzb21ldXNlckBlbWFpbC5jb20iLCJleHAiOjE3MTI3NzY1NjEsImlhdCI6MTcxMjc3Mjk2MX0.tsJWMK1v15VEp2KKvuV6J_v1LRom88AiR3mY8GfGan4",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8080/agents",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"agents"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Add one agent",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywidXNlcm5hbWUiOiJzb21ldXNlckBlbWFpbC5jb20iLCJleHAiOjE3MTI3NzY1NjEsImlhdCI6MTcxMjc3Mjk2MX0.tsJWMK1v15VEp2KKvuV6J_v1LRom88AiR3mY8GfGan4",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8080/agent",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"agent"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete one agent",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywidXNlcm5hbWUiOiJzb21ldXNlckBlbWFpbC5jb20iLCJleHAiOjE3MTI3NzY1NjEsImlhdCI6MTcxMjc3Mjk2MX0.tsJWMK1v15VEp2KKvuV6J_v1LRom88AiR3mY8GfGan4",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8080/agent",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"agent"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		}
+	]
+}

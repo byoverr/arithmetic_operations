@@ -98,7 +98,7 @@ func (c *Calculator) AddAgent() {
 }
 
 func (c *Calculator) RemoveAgent() error {
-	if len(c.Agents) > 2 {
+	if len(c.Agents) > 1 {
 		c.Agents = c.Agents[:c.NumberOfAgents-1]
 		c.NumberOfAgents--
 		return nil
