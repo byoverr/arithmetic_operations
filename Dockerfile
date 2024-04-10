@@ -16,10 +16,12 @@ COPY . .
 # Copy the config.json file
 COPY config.json /app/config.json
 
-EXPOSE 8099
+
+# Expose port 8080
+EXPOSE 8080
 
 # Build the application
-RUN CGO_ENABLED=0 go build -o /app/main.go
+RUN CGO_ENABLED=0 go build -o cmd/main cmd/main.go
 
 # Start the application
-CMD ["/app/main.go"]
+CMD ["cmd/main"]
