@@ -112,9 +112,10 @@ http://localhost:8080/
 ## Инструкция к запуску:
 ### Способ с Docker:
 1. Скачать [Docker](https://www.docker.com/products/docker-desktop/)
-2. Перейти в папку проекта с помощью `cd <путь к файлу>`
-3. Ввести команду `docker compose -f docker-compose.yml -p arithmetic_operations up`
-4. Готово, все запустилось, по тестам читать далее
+2. Склонировать проект или скачать `git clone github.com/byoverr/arithmetic_operations`
+3. Перейти в папку проекта с помощью `cd <путь к файлу>`
+4. Ввести команду `docker compose -f docker-compose.yml -p arithmetic_operations up`
+5. Готово, все запустилось, по тестам читать далее
 
 P.S Чтобы удалить контейнеры и образы используйте такие команды как:
 
