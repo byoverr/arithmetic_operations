@@ -11,7 +11,7 @@ COPY go.mod go.sum ./
 RUN go mod download
 
 # Copy the source code
-COPY . .
+COPY .. .
 
 # Copy the config.json file
 COPY config.json /app/config.json
@@ -24,4 +24,4 @@ EXPOSE 8080
 RUN CGO_ENABLED=0 go build -o cmd/main cmd/main.go
 
 # Start the application
-CMD ["cmd/main"]
+CMD ["go", "run", "cmd/main"]
