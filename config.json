@@ -1,11 +1,11 @@
 {
   "http_server": {
-    "address": "localhost:8080",
+    "address": "0.0.0.0:8080",
     "timeout": "5s",
     "idle_timeout": "60s"
   },
   "storage": {
-    "url": "postgres://postgres:admin@localhost:5432/arithmetic_operations?sslmode=disable"
+    "url": "postgres://postgres:admin@postgres:5432/arithmetic_operations?sslmode=disable"
   },
   "operation": {
     "count_operation": 4,
@@ -18,8 +18,8 @@
     "count_of_agents": 1
   },
   "auth_service": {
-  "cost": 12,
-  "secret": "bdd60f0540254782d896196e129b2610c2b574d1055a6517712ed0b9073e46f1",
-  "token_ttl": "1h"
+    "cost": 12,
+    "secret": "bdd60f0540254782d896196e129b2610c2b574d1055a6517712ed0b9073e46f1",
+    "token_ttl": "1h"
   }
 }

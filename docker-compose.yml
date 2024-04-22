@@ -13,6 +13,7 @@ services:
       POSTGRES_DB: arithmetic_operations
     volumes:
       - data:/var/lib/postgresql/data
+    command: [ "postgres", "-c", "log_statement=all" ]
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U postgres" ]
       interval: 5s
@@ -21,13 +22,12 @@ services:
 
 
   app:
+    build: .
+    command: go run ./cmd/main.go
     container_name: go_app
-
     restart: unless-stopped
     ports:
       - "8080:8080"
-    build:
-      dockerfile: Dockerfile
     depends_on:
       - postgres
 
